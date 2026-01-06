@@ -1,0 +1,396 @@
+# Complete Setup Instructions
+
+## Project Structure
+
+Your project should have this structure:
+
+```
+project-root/
+├── CinemaTicketSystem/          # Backend (ASP.NET Core)
+│   ├── Controllers/
+│   ├── Data/
+│   ├── DTOs/
+│   ├── Models/
+│   ├── Services/
+│   ├── Program.cs
+│   ├── CinemaTicketSystem.csproj
+│   └── appsettings.json
+│
+└── cinema-frontend/             # Frontend (React)
+    ├── public/
+    │   └── index.html
+    ├── src/
+    │   ├── components/
+    │   ├── services/
+    │   ├── App.js
+    │   ├── index.js
+    │   └── index.css
+    ├── package.json
+    └── .gitignore
+```
+
+## Step 1: Backend Setup
+
+### 1.1 Install Prerequisites
+```bash
+# Check .NET installation
+dotnet --version
+# Should show 8.0.x or higher
+```
+
+If not installed, download from: https://dotnet.microsoft.com/download/dotnet/8.0
+
+### 1.2 Create/Navigate to Backend Directory
+```bash
+mkdir CinemaTicketSystem
+cd CinemaTicketSystem
+```
+
+### 1.3 Create All Backend Files
+
+Create the following files with the provided code:
+
+**Controllers/**
+- AuthController.cs
+- CinemasController.cs
+- ReservationsController.cs *(from document 1)*
+- ScreeningsController.cs
+- UsersController.cs
+
+**Data/**
+- CinemaDbContext.cs
+
+**DTOs/**
+- ReservationDTOs.cs
+- ScreeningDTOs.cs
+- UserDTOs.cs
+
+**Models/**
+- Cinema.cs
+- Reservation.cs
+- Screening.cs
+- User.cs
+
+**Services/**
+- IPasswordHasher.cs
+- PasswordHasher.cs
+
+**Root Files:**
+- Program.cs *(from artifact #1)*
+- CinemaTicketSystem.csproj *(from artifact #2)*
+- appsettings.json *(existing)*
+
+### 1.4 Restore and Run Backend
+```bash
+# Restore NuGet packages
+dotnet restore
+
+# Build the project
+dotnet build
+
+# Run the application
+dotnet run
+```
+
+**Expected output:**
+```
+🎬 Creating database...
+✅ Database created!
+👤 Admin created: admin@cinema.com / Admin@123
+👤 User created: john@email.com / User@123
+🎥 Sample screenings created!
+🚀 Application ready!
+Now listening on: http://localhost:5155
+```
+
+**Test the API:**
+Open browser: http://localhost:5155/swagger
+
+## Step 2: Frontend Setup
+
+### 2.1 Install Prerequisites
+```bash
+# Check Node.js installation
+node --version
+# Should show v18.x or higher
+
+npm --version
+# Should show 9.x or higher
+```
+
+If not installed, download from: https://nodejs.org/
+
+### 2.2 Create Frontend Directory
+```bash
+# From project root
+npx create-react-app cinema-frontend
+cd cinema-frontend
+```
+
+### 2.3 Install Additional Dependencies
+```bash
+npm install react-router-dom
+```
+
+### 2.4 Create Frontend Files
+
+**Replace/Create these files:**
+
+**public/index.html** *(from artifact #10)*
+
+**src/index.js** *(from artifact #11)*
+
+**src/App.js** *(existing, already provided)*
+
+**src/index.css** (keep existing or use minimal styles):
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+```
+
+**Create src/services/**
+```bash
+mkdir src/services
+```
+
+**src/services/api.js** *(from artifact #3)*
+
+**Create src/components/**
+```bash
+mkdir src/components
+```
+
+**src/components/Login.jsx** *(from artifact #8)*
+**src/components/Register.jsx** *(from artifact #4)*
+**src/components/ScreeningList.jsx** *(from artifact #5)*
+**src/components/SeatSelection.jsx** *(from document 2)*
+**src/components/UserProfile.jsx** *(from artifact #6)*
+**src/components/AdminPanel.jsx** *(from artifact #7)*
+
+### 2.5 Update package.json
+
+Add proxy to **package.json** *(from artifact #12)*:
+```json
+"proxy": "http://localhost:5155"
+```
+
+### 2.6 Start Frontend
+```bash
+npm start
+```
+
+**Expected output:**
+```
+Compiled successfully!
+
+You can now view cinema-frontend in the browser.
+
+  Local:            http://localhost:3000
+  On Your Network:  http://192.168.1.x:3000
+```
+
+## Step 3: Verify Everything Works
+
+### 3.1 Test User Flow
+1. Open http://localhost:3000
+2. Click "Register here"
+3. Create a new account
+4. Login with your account
+5. View available screenings
+6. Click "Select Seats" on a screening
+7. Reserve some seats (click green seats)
+8. Cancel reservations (click blue seats)
+
+### 3.2 Test Admin Flow
+1. Logout
+2. Login as admin:
+   - Email: admin@cinema.com
+   - Password: Admin@123
+3. Click "Admin Panel"
+4. Create a new screening
+5. View users list
+6. Navigate to "User View"
+7. Test the new screening
+
+### 3.3 Test Concurrency
+1. Open two browser windows (e.g., Chrome and Firefox)
+2. Login with different users in each
+3. Navigate to the same screening
+4. Try to book the same seat simultaneously
+5. **Expected:** One succeeds, one gets error "This seat was just reserved by another user"
+
+## Step 4: Troubleshooting
+
+### Backend Issues
+
+**Issue: Port 5155 already in use**
+```bash
+# Kill the process using port 5155
+# Windows:
+netstat -ano | findstr :5155
+taskkill /PID <PID> /F
+
+# Mac/Linux:
+lsof -ti:5155 | xargs kill -9
+```
+
+**Issue: Database errors**
+```bash
+# Delete the database and restart
+rm cinema.db
+dotnet run
+```
+
+**Issue: Package restore fails**
+```bash
+# Clear NuGet cache
+dotnet nuget locals all --clear
+dotnet restore
+```
+
+### Frontend Issues
+
+**Issue: npm install fails**
+```bash
+# Clear npm cache
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Issue: "Module not found" errors**
+```bash
+# Verify all files are in correct locations
+# Check that App.js has correct imports
+# Ensure all components are exported correctly
+```
+
+**Issue: CORS errors**
+- Ensure backend is running
+- Check proxy in package.json is "http://localhost:5155"
+- Verify API_BASE_URL in api.js is correct
+
+**Issue: Compilation errors**
+```bash
+# Delete node_modules and reinstall
+rm -rf node_modules
+npm install
+npm start
+```
+
+## Step 5: Production Build
+
+### 5.1 Build Backend for Production
+```bash
+cd CinemaTicketSystem
+dotnet publish -c Release -o ./publish
+```
+
+### 5.2 Build Frontend for Production
+```bash
+cd cinema-frontend
+npm run build
+```
+
+### 5.3 Deploy Together (Single Server)
+1. Copy `cinema-frontend/build/*` to `CinemaTicketSystem/wwwroot/`
+2. Update `Program.cs` to serve static files:
+```csharp
+app.UseStaticFiles();
+app.UseDefaultFiles();
+```
+3. Deploy the backend application
+
+## Common Commands Reference
+
+### Backend
+```bash
+dotnet restore          # Restore packages
+dotnet build           # Build project
+dotnet run             # Run development
+dotnet watch run       # Run with hot reload
+dotnet publish         # Build for production
+```
+
+### Frontend
+```bash
+npm install            # Install dependencies
+npm start              # Start dev server
+npm run build          # Build for production
+npm test               # Run tests
+```
+
+## File Checklist
+
+Before running, ensure you have created all these files:
+
+### Backend (14 files)
+- [ ] Program.cs
+- [ ] CinemaTicketSystem.csproj
+- [ ] appsettings.json
+- [ ] Controllers/AuthController.cs
+- [ ] Controllers/CinemasController.cs
+- [ ] Controllers/ReservationsController.cs
+- [ ] Controllers/ScreeningsController.cs
+- [ ] Controllers/UsersController.cs
+- [ ] Data/CinemaDbContext.cs
+- [ ] DTOs/ReservationDTOs.cs
+- [ ] DTOs/ScreeningDTOs.cs
+- [ ] DTOs/UserDTOs.cs
+- [ ] Models/Cinema.cs
+- [ ] Models/Reservation.cs
+- [ ] Models/Screening.cs
+- [ ] Models/User.cs
+- [ ] Services/IPasswordHasher.cs
+- [ ] Services/PasswordHasher.cs
+
+### Frontend (9 files)
+- [ ] public/index.html
+- [ ] src/index.js
+- [ ] src/index.css
+- [ ] src/App.js
+- [ ] src/services/api.js
+- [ ] src/components/Login.jsx
+- [ ] src/components/Register.jsx
+- [ ] src/components/ScreeningList.jsx
+- [ ] src/components/SeatSelection.jsx
+- [ ] src/components/UserProfile.jsx
+- [ ] src/components/AdminPanel.jsx
+- [ ] package.json
+
+## Success Criteria
+
+✅ Backend starts without errors
+✅ Database creates automatically with sample data
+✅ Swagger UI accessible at /swagger
+✅ Frontend compiles without errors
+✅ Can register new user
+✅ Can login with test credentials
+✅ Can view screenings
+✅ Can reserve and cancel seats
+✅ Admin can create/delete screenings
+✅ Admin can view/delete users
+✅ Concurrency errors handled properly
+
+## Need Help?
+
+1. Check terminal output for errors
+2. Check browser console (F12) for frontend errors
+3. Verify all files are in correct locations
+4. Ensure both backend and frontend are running
+5. Try the troubleshooting steps above
+
+---
+
+**After successful setup, you should have a fully functional cinema ticket booking system! 🎉**
