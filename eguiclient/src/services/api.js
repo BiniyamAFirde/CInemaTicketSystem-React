@@ -24,12 +24,12 @@ class ApiService {
     this.currentUser = null;
   }
 
-  // ✅ FIXED: Enhanced response handler with better conflict detection
+  
   async handleResponse(response) {
     const contentType = response.headers.get('content-type');
     const isJson = contentType && contentType.includes('application/json');
     
-    // Parse response body
+    
     let data;
     try {
       data = isJson ? await response.json() : await response.text();
@@ -38,7 +38,7 @@ class ApiService {
     }
 
     if (!response.ok) {
-      // Extract error message
+      
       let errorMessage = 'An error occurred';
       
       if (data) {
@@ -54,13 +54,13 @@ class ApiService {
       const error = new Error(errorMessage);
       error.status = response.status;
       
-      // ✅ CRITICAL: Attach conflict flag for 409 Conflict responses
+      
       if (response.status === 409) {
         error.conflict = true;
         console.log('🔴 CONFLICT DETECTED:', errorMessage);
       }
       
-      // Also check if response explicitly says it's a conflict
+      
       if (data && data.conflict === true) {
         error.conflict = true;
         console.log('🔴 CONFLICT FLAG DETECTED:', errorMessage);
@@ -72,7 +72,7 @@ class ApiService {
     return data;
   }
 
-  // Auth endpoints
+  
   async register(userData) {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
@@ -93,7 +93,7 @@ class ApiService {
     return user;
   }
 
-  // User endpoints
+  
   async getUsers() {
     const response = await fetch(`${API_BASE_URL}/users`);
     return this.handleResponse(response);
@@ -193,7 +193,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  // ✅ CRITICAL: Create reservation with proper error handling
+  
   async createReservation(reservationData) {
     const userId = this.currentUser?.id;
     if (!userId) {

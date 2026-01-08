@@ -1,4 +1,4 @@
-// Models/User.cs - COMPLETE REPLACEMENT
+
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -32,8 +32,8 @@ namespace CinemaTicketSystem.Models
         
         public bool IsAdmin { get; set; }
         
-        // ✅ For SQLite, we'll use a timestamp as a string
-        [ConcurrencyCheck] // This tells EF Core to check this field for concurrency
+        
+        [ConcurrencyCheck] 
         public string RowVersion { get; set; }
         
         public virtual ICollection<Reservation> Reservations { get; set; }
@@ -41,7 +41,7 @@ namespace CinemaTicketSystem.Models
         public User()
         {
             Reservations = new List<Reservation>();
-            RowVersion = Guid.NewGuid().ToString(); // ✅ Generate unique version
+            RowVersion = Guid.NewGuid().ToString(); 
         }
     }
 }

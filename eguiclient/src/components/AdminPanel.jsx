@@ -30,12 +30,12 @@ function AdminPanel({ currentUser, onLogout }) {
     isAdmin: false
   });
 
-  // ✅ Store RowVersion with edit form
+
   const [editUserForm, setEditUserForm] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    rowVersion: '' // ✅ CRITICAL: Track RowVersion
+    rowVersion: '' 
   });
 
   const navigate = useNavigate();
@@ -132,19 +132,19 @@ function AdminPanel({ currentUser, onLogout }) {
     }
   };
 
-  // ✅ CRITICAL: Include RowVersion when opening edit modal
+  
   const handleOpenEditModal = (user) => {
     setEditingUser(user);
     setEditUserForm({
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      rowVersion: user.rowVersion // ✅ STORE CURRENT ROWVERSION
+      rowVersion: user.rowVersion 
     });
     setShowEditUserModal(true);
   };
 
-  // ✅ CRITICAL: Send RowVersion with update request
+ 
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     setError('');
@@ -155,7 +155,7 @@ function AdminPanel({ currentUser, onLogout }) {
         firstName: editUserForm.firstName,
         lastName: editUserForm.lastName,
         phoneNumber: editUserForm.phoneNumber,
-        rowVersion: editUserForm.rowVersion // ✅ SEND ROWVERSION FOR CONCURRENCY CHECK
+        rowVersion: editUserForm.rowVersion 
       });
       
       setSuccess('✅ User updated successfully!');
@@ -164,7 +164,7 @@ function AdminPanel({ currentUser, onLogout }) {
       await loadData();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      // ✅ Handle conflict errors
+      
       if (err.conflict) {
         setError('⚠️ CONFLICT: This user was modified by another admin. Refreshing with latest data...');
         setTimeout(async () => {
@@ -179,7 +179,7 @@ function AdminPanel({ currentUser, onLogout }) {
     }
   };
 
-  // ✅ CRITICAL: Send RowVersion with toggle admin request
+ 
   const handleToggleAdmin = async (userId) => {
     const user = users.find(u => u.id === userId);
     const action = user.isAdmin ? 'remove admin rights from' : 'make admin';
@@ -189,7 +189,7 @@ function AdminPanel({ currentUser, onLogout }) {
     }
 
     try {
-      await apiService.toggleUserAdmin(userId, user.rowVersion); // ✅ PASS ROWVERSION
+      await apiService.toggleUserAdmin(userId, user.rowVersion); 
       setSuccess('✅ User role updated successfully!');
       await loadData();
       setTimeout(() => setSuccess(''), 3000);
@@ -206,7 +206,7 @@ function AdminPanel({ currentUser, onLogout }) {
     }
   };
 
-  // ✅ CRITICAL: Send RowVersion with delete request
+  
   const handleDeleteUser = async (userId) => {
     const user = users.find(u => u.id === userId);
     
@@ -215,7 +215,7 @@ function AdminPanel({ currentUser, onLogout }) {
     }
 
     try {
-      await apiService.deleteUser(userId, user.rowVersion); // ✅ PASS ROWVERSION
+      await apiService.deleteUser(userId, user.rowVersion); 
       setSuccess('✅ User deleted successfully!');
       await loadData();
       setTimeout(() => setSuccess(''), 3000);

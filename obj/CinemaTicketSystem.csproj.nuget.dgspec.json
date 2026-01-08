@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/macbookpro13/Desktop/GUI_react copy 2/CinemaTicketSystem.csproj": {}
+    "/Users/macbookpro13/Desktop/GUI_react copy 4/CinemaTicketSystem.csproj": {}
   },
   "projects": {
-    "/Users/macbookpro13/Desktop/GUI_react copy 2/CinemaTicketSystem.csproj": {
+    "/Users/macbookpro13/Desktop/GUI_react copy 4/CinemaTicketSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbookpro13/Desktop/GUI_react copy 2/CinemaTicketSystem.csproj",
+        "projectUniqueName": "/Users/macbookpro13/Desktop/GUI_react copy 4/CinemaTicketSystem.csproj",
         "projectName": "CinemaTicketSystem",
-        "projectPath": "/Users/macbookpro13/Desktop/GUI_react copy 2/CinemaTicketSystem.csproj",
+        "projectPath": "/Users/macbookpro13/Desktop/GUI_react copy 4/CinemaTicketSystem.csproj",
         "packagesPath": "/Users/macbookpro13/.nuget/packages/",
-        "outputPath": "/Users/macbookpro13/Desktop/GUI_react copy 2/obj/",
+        "outputPath": "/Users/macbookpro13/Desktop/GUI_react copy 4/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbookpro13/.nuget/NuGet/NuGet.Config"

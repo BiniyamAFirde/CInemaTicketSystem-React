@@ -70,7 +70,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* Scrollbar styling */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -89,7 +89,7 @@ code {
   background: #764ba2;
 }
 
-/* Utility classes */
+
 .min-vh-100 {
   min-height: 100vh;
 }
@@ -113,7 +113,7 @@ code {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
-/* Bootstrap overrides for better styling */
+
 .btn {
   transition: all 0.2s ease;
 }
@@ -138,7 +138,7 @@ code {
   box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
 }
 
-/* Media queries */
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

@@ -45,7 +45,6 @@ namespace CinemaTicketSystem.DTOs
         [Phone]
         public string PhoneNumber { get; set; }
 
-        // ✅ ADD ROWVERSION FOR CONCURRENCY CONTROL
         [Required]
         public string RowVersion { get; set; }
     }
@@ -82,7 +81,7 @@ namespace CinemaTicketSystem.DTOs
         public string PhoneNumber { get; set; }
         public bool IsAdmin { get; set; }
         
-        // ✅ ADD ROWVERSION TO RESPONSE
+      
         public string RowVersion { get; set; }
     }
 }

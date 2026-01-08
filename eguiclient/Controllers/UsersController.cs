@@ -38,7 +38,7 @@ namespace CinemaTicketSystem.Controllers
                     Email = u.Email,
                     PhoneNumber = u.PhoneNumber,
                     IsAdmin = u.IsAdmin,
-                    RowVersion = u.RowVersion // ✅ Now a string
+                    RowVersion = u.RowVersion 
                 })
                 .ToListAsync();
 
@@ -79,7 +79,7 @@ namespace CinemaTicketSystem.Controllers
                 PhoneNumber = dto.PhoneNumber,
                 PasswordHash = _passwordHasher.HashPassword(dto.Password),
                 IsAdmin = dto.IsAdmin,
-                RowVersion = Guid.NewGuid().ToString() // ✅ Initialize
+                RowVersion = Guid.NewGuid().ToString() 
             };
 
             _context.Users.Add(user);
@@ -104,7 +104,7 @@ namespace CinemaTicketSystem.Controllers
         {
             _logger.LogInformation($"🔄 Updating user {id} with RowVersion: {dto.RowVersion}");
 
-            // ✅ CRITICAL: Use AsNoTracking to get fresh data from database
+         
             var userInDb = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == id);
@@ -118,7 +118,7 @@ namespace CinemaTicketSystem.Controllers
             _logger.LogInformation($"📊 Database RowVersion: {userInDb.RowVersion}");
             _logger.LogInformation($"📊 Client RowVersion: {dto.RowVersion}");
 
-            // ✅ STEP 1: Check if RowVersions match (Optimistic Concurrency Check)
+           
             if (userInDb.RowVersion != dto.RowVersion)
             {
                 _logger.LogWarning($"⚠️ CONFLICT DETECTED for user {id}!");
@@ -139,35 +139,35 @@ namespace CinemaTicketSystem.Controllers
                 });
             }
 
-            // ✅ STEP 2: Create a new tracked entity with updated values
+            
             var user = new User
             {
                 Id = id,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
-                Email = userInDb.Email, // Keep existing email
+                Email = userInDb.Email, 
                 PhoneNumber = dto.PhoneNumber,
-                PasswordHash = userInDb.PasswordHash, // Keep existing password
-                IsAdmin = userInDb.IsAdmin, // Keep existing admin status
-                RowVersion = dto.RowVersion // Set the original version
+                PasswordHash = userInDb.PasswordHash, 
+                IsAdmin = userInDb.IsAdmin, 
+                RowVersion = dto.RowVersion 
             };
 
-            // ✅ STEP 3: Attach and mark as modified
+           
             _context.Users.Attach(user);
             _context.Entry(user).State = EntityState.Modified;
             
-            // Don't update these fields
+            
             _context.Entry(user).Property(u => u.Email).IsModified = false;
             _context.Entry(user).Property(u => u.PasswordHash).IsModified = false;
             _context.Entry(user).Property(u => u.IsAdmin).IsModified = false;
 
-            // ✅ STEP 4: Generate new RowVersion BEFORE saving
+            
             var newRowVersion = Guid.NewGuid().ToString();
             user.RowVersion = newRowVersion;
 
             try
             {
-                // ✅ STEP 5: Save changes (EF will check concurrency)
+                
                 await _context.SaveChangesAsync();
                 
                 _logger.LogInformation($"✅ User {id} updated successfully. New RowVersion: {newRowVersion}");
@@ -204,7 +204,7 @@ namespace CinemaTicketSystem.Controllers
                 return NotFound(new { message = "User not found" });
             }
 
-            // ✅ Check for conflicts
+            
             if (userInDb.RowVersion != dto.RowVersion)
             {
                 _logger.LogWarning($"⚠️ CONFLICT: RowVersion mismatch for user {id}");
@@ -216,7 +216,7 @@ namespace CinemaTicketSystem.Controllers
                 });
             }
 
-            // ✅ Create updated entity
+            
             var user = new User
             {
                 Id = id,
@@ -225,18 +225,18 @@ namespace CinemaTicketSystem.Controllers
                 Email = userInDb.Email,
                 PhoneNumber = userInDb.PhoneNumber,
                 PasswordHash = userInDb.PasswordHash,
-                IsAdmin = !userInDb.IsAdmin, // Toggle
+                IsAdmin = !userInDb.IsAdmin, 
                 RowVersion = dto.RowVersion
             };
 
             _context.Users.Attach(user);
             _context.Entry(user).State = EntityState.Modified;
             
-            // Update only IsAdmin
+            
             _context.Entry(user).Property(u => u.Email).IsModified = false;
             _context.Entry(user).Property(u => u.PasswordHash).IsModified = false;
 
-            // Generate new RowVersion
+            
             var newRowVersion = Guid.NewGuid().ToString();
             user.RowVersion = newRowVersion;
 
@@ -288,7 +288,7 @@ namespace CinemaTicketSystem.Controllers
                 return BadRequest(new { message = "Cannot delete admin users" });
             }
 
-            // ✅ Check for conflicts
+           
             if (userInDb.RowVersion != dto.RowVersion)
             {
                 _logger.LogWarning($"⚠️ CONFLICT: RowVersion mismatch for user {id}");
@@ -300,12 +300,12 @@ namespace CinemaTicketSystem.Controllers
                 });
             }
 
-            // ✅ Create entity for deletion
+            
             var user = new User
             {
                 Id = id,
                 RowVersion = dto.RowVersion,
-                // Other properties don't matter for deletion
+                
                 FirstName = userInDb.FirstName,
                 LastName = userInDb.LastName,
                 Email = userInDb.Email,
@@ -338,7 +338,7 @@ namespace CinemaTicketSystem.Controllers
         }
     }
 
-    // DTOs for operations requiring RowVersion
+    
     public class ToggleAdminDto
     {
         public string RowVersion { get; set; }

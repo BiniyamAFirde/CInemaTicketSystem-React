@@ -12,7 +12,6 @@ function SeatSelection({ currentUser }) {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // ✅ NEW: Confirmation modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -41,7 +40,6 @@ function SeatSelection({ currentUser }) {
     }
   };
 
-  // ✅ STEP 1: Handle seat click - show confirmation for new reservations
   const handleSeatClick = async (seat) => {
     if (seat.isReserved && seat.userId !== currentUser.id) {
       setError('⚠️ This seat is already reserved by another user');
@@ -52,18 +50,15 @@ function SeatSelection({ currentUser }) {
     setError('');
     setSuccessMessage('');
 
-    // If it's user's own seat, cancel immediately without confirmation
     if (seat.isReserved && seat.userId === currentUser.id) {
       await handleCancelReservation(seat);
       return;
     }
 
-    // ✅ For new reservations, show confirmation dialog
     setSelectedSeat(seat);
     setShowConfirmModal(true);
   };
 
-  // ✅ STEP 2: Confirm reservation with concurrency handling
   const handleConfirmReservation = async () => {
     if (!selectedSeat) return;
     
@@ -72,7 +67,7 @@ function SeatSelection({ currentUser }) {
     setSuccessMessage('');
 
     try {
-      // ✅ Create reservation - backend handles conflicts
+      
       await apiService.createReservation({
         screeningId: parseInt(id),
         row: selectedSeat.row,
@@ -82,18 +77,17 @@ function SeatSelection({ currentUser }) {
       setSuccessMessage(`✅ Seat Row ${selectedSeat.row + 1}, Seat ${selectedSeat.seat + 1} reserved successfully!`);
       setShowConfirmModal(false);
       setSelectedSeat(null);
-      
-      // Reload seat map to show updated state
+
       await loadScreeningData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      // ✅ Handle concurrency conflicts
+  
       if (err.conflict) {
         setError('⚠️ CONFLICT: This seat was just reserved by another user. Please select a different seat.');
         setShowConfirmModal(false);
         setSelectedSeat(null);
-        await loadScreeningData(); // Refresh seat map
+        await loadScreeningData(); 
       } else {
         setError(err.message || 'Failed to reserve seat');
       }
@@ -103,13 +97,13 @@ function SeatSelection({ currentUser }) {
     }
   };
 
-  // ✅ Cancel confirmation dialog
+
   const handleCancelConfirmation = () => {
     setShowConfirmModal(false);
     setSelectedSeat(null);
   };
 
-  // ✅ Cancel existing reservation
+  
   const handleCancelReservation = async (seat) => {
     setError('');
     setSuccessMessage('');

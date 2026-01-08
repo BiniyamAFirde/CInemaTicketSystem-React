@@ -22,8 +22,7 @@ function UserProfile({ currentUser, onUpdate }) {
 
     try {
       const response = await apiService.updateUser(currentUser.id, formData);
-      
-      // ✅ Update current user with new RowVersion
+     
       const updatedUser = { 
         ...currentUser, 
         ...formData,
@@ -34,8 +33,7 @@ function UserProfile({ currentUser, onUpdate }) {
       onUpdate(updatedUser);
 
       setSuccess('✅ Profile updated successfully!');
-      
-      // ✅ Update form with new RowVersion
+    
       setFormData(prev => ({
         ...prev,
         rowVersion: response.rowVersion || prev.rowVersion
@@ -46,7 +44,7 @@ function UserProfile({ currentUser, onUpdate }) {
       if (err.conflict) {
         setError('⚠️ CONFLICT: Your profile was modified in another session. The page will refresh with the latest data.');
         setTimeout(async () => {
-          // Reload user data
+         
           const freshUser = await apiService.getUser(currentUser.id);
           apiService.saveCurrentUser(freshUser);
           onUpdate(freshUser);

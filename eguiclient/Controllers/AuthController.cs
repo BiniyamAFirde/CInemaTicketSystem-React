@@ -20,7 +20,6 @@ namespace CinemaTicketSystem.Controllers
             _passwordHasher = passwordHasher;
         }
 
-        // Controllers/AuthController.cs - UPDATE the Register and Login methods
         [HttpPost("register")]
         public async Task<ActionResult<UserResponseDto>> Register(UserRegistrationDto dto)
         {
@@ -37,7 +36,7 @@ namespace CinemaTicketSystem.Controllers
                 PhoneNumber = dto.PhoneNumber,
                 PasswordHash = _passwordHasher.HashPassword(dto.Password),
                 IsAdmin = false,
-                RowVersion = Guid.NewGuid().ToString() // ✅ String now
+                RowVersion = Guid.NewGuid().ToString() 
             };
 
             _context.Users.Add(user);
@@ -51,7 +50,7 @@ namespace CinemaTicketSystem.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 IsAdmin = user.IsAdmin,
-                RowVersion = user.RowVersion // ✅ Return as-is
+                RowVersion = user.RowVersion 
             });
         }
 
@@ -73,7 +72,7 @@ namespace CinemaTicketSystem.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 IsAdmin = user.IsAdmin,
-                RowVersion = user.RowVersion // ✅ Return as-is
+                RowVersion = user.RowVersion 
             });
         }
     }

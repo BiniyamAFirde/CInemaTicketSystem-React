@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import apiService from './services/api';
 
-// Import components
 import Login from './components/Login';
 import Register from './components/Register';
 import ScreeningList from './components/ScreeningList';
@@ -15,7 +14,7 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Check if user is still logged in
+    
     const user = apiService.getCurrentUser();
     setCurrentUser(user);
   }, []);

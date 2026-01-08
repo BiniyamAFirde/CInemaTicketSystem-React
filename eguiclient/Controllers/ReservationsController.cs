@@ -113,13 +113,13 @@ namespace CinemaTicketSystem.Controllers
             });
         }
 
-        // ✅ FIXED: CREATE RESERVATION WITH PROPER RETRY LOGIC
+       
         [HttpPost]
         public async Task<ActionResult<ReservationResponseDto>> CreateReservation(
             CreateReservationDto dto, 
             [FromQuery] int userId)
         {
-            // Retry up to 3 times for the first admin to succeed
+           
             int maxRetries = 3;
             int retryCount = 0;
 
@@ -127,7 +127,7 @@ namespace CinemaTicketSystem.Controllers
             {
                 try
                 {
-                    // Validate screening exists
+                    
                     var screening = await _context.Screenings
                         .Include(s => s.Cinema)
                         .FirstOrDefaultAsync(s => s.Id == dto.ScreeningId);
@@ -137,14 +137,14 @@ namespace CinemaTicketSystem.Controllers
                         return BadRequest(new { message = "Screening not found" });
                     }
 
-                    // Validate seat position
+                   
                     if (dto.Row < 0 || dto.Row >= screening.Cinema.Rows ||
                         dto.Seat < 0 || dto.Seat >= screening.Cinema.SeatsPerRow)
                     {
                         return BadRequest(new { message = "Invalid seat position" });
                     }
 
-                    // Check if seat is already reserved
+                   
                     var existingReservation = await _context.Reservations
                         .AsNoTracking()
                         .FirstOrDefaultAsync(r => 
@@ -163,7 +163,6 @@ namespace CinemaTicketSystem.Controllers
                         });
                     }
 
-                    // Create new reservation
                     var reservation = new Reservation
                     {
                         ScreeningId = dto.ScreeningId,
@@ -175,7 +174,7 @@ namespace CinemaTicketSystem.Controllers
 
                     _context.Reservations.Add(reservation);
 
-                    // Try to save - this will succeed for first admin, fail for second
+                   
                     await _context.SaveChangesAsync();
 
                     _logger.LogInformation($"✅ Reservation successful: User {userId} booked Screening {dto.ScreeningId}, Row {dto.Row}, Seat {dto.Seat}");
@@ -195,10 +194,10 @@ namespace CinemaTicketSystem.Controllers
                 }
                 catch (DbUpdateException ex)
                 {
-                    // Clear the context to avoid tracking issues on retry
+                 
                     _context.ChangeTracker.Clear();
 
-                    // Check if it's a unique constraint violation
+                  
                     if (ex.InnerException?.Message.Contains("UNIQUE constraint failed") == true ||
                         ex.InnerException?.Message.Contains("constraint") == true)
                     {
@@ -211,7 +210,7 @@ namespace CinemaTicketSystem.Controllers
                         });
                     }
 
-                    // Check for SQLite database locked error (retry for first admin)
+                    
                     if (ex.InnerException?.Message.Contains("database is locked") == true ||
                         ex.InnerException?.Message.Contains("locked") == true)
                     {
@@ -224,9 +223,9 @@ namespace CinemaTicketSystem.Controllers
                             return StatusCode(500, new { message = "Server is busy. Please try again in a moment." });
                         }
 
-                        // Wait a bit before retrying (exponential backoff)
+                   
                         await Task.Delay(100 * retryCount);
-                        continue; // Retry
+                        continue; 
                     }
 
                     _logger.LogError(ex, "Database error during reservation creation");
