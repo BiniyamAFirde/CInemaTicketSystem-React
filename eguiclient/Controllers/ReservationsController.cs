@@ -120,7 +120,7 @@ namespace CinemaTicketSystem.Controllers
             [FromQuery] int userId)
         {
            
-            int maxRetries = 3;
+            int maxRetries = 3;     // if database is locked
             int retryCount = 0;
 
             while (retryCount < maxRetries)
@@ -158,7 +158,7 @@ namespace CinemaTicketSystem.Controllers
                         return Conflict(new 
                         { 
                             message = "⚠️ This seat is already reserved. Please select a different seat.",
-                            conflict = true,
+                            conflict = true,  //
                             reservedBy = existingReservation.UserId
                         });
                     }

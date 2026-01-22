@@ -1,0 +1,9 @@
+﻿<h1>Calculator</h1>
+<form asp-action="Compute" method="post">
+    <input type="number" name="n1" />
+    <input type="number" name="n2" />
+    <button type="submit">Compute</button>
+    <button type="button" onclick="location.href='@Url.Action("Return")'">
+        Return
+    </button>
+</form>

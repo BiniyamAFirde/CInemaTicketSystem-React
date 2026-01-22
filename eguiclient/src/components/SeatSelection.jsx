@@ -67,7 +67,7 @@ function SeatSelection({ currentUser }) {
     setSuccessMessage('');
 
     try {
-      
+      // request to back
       await apiService.createReservation({
         screeningId: parseInt(id),
         row: selectedSeat.row,
@@ -82,7 +82,7 @@ function SeatSelection({ currentUser }) {
       
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-  
+  //
       if (err.conflict) {
         setError('⚠️ CONFLICT: This seat was just reserved by another user. Please select a different seat.');
         setShowConfirmModal(false);

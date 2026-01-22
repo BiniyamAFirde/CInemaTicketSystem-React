@@ -1,0 +1,80 @@
+@model IEnumerable<Movie>
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold mb-3" style="background: linear-gradient(135deg, #e50914 0%, #831010 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-film"></i> Now Showing
+    </h1>
+    <p class="lead text-secondary">Discover the latest movies and book your tickets today</p>
+</div>
+
+@if (Model.Any())
+{
+    <div class="row g-4">
+        @foreach (var movie in Model)
+        {
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-3">
+                            <div class="rounded-3 text-center py-5" style="background: linear-gradient(135deg, rgba(229, 9, 20, 0.2) 0%, rgba(131, 16, 16, 0.2) 100%);">
+                                <i class="fas fa-film fa-4x" style="color: #e50914; opacity: 0.7;"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">@movie.Title</h5>
+                        <div class="mb-auto">
+                            <p class="text-secondary mb-2">
+                                <i class="fas fa-theater-masks me-2" style="color: #e50914;"></i>
+                                <span class="fw-semibold">Genre:</span> @movie.Genre
+                            </p>
+                            <p class="text-secondary mb-2">
+                                <i class="fas fa-clock me-2" style="color: #e50914;"></i>
+                                <span class="fw-semibold">Duration:</span> @movie.DurationMinutes mins
+                            </p>
+                            <p class="text-secondary">
+                                <i class="fas fa-calendar-alt me-2" style="color: #e50914;"></i>
+                                <span class="fw-semibold">Released:</span> @movie.ReleaseDate.ToString("MMM d, yyyy")
+                            </p>
+                        </div>
+                        <div class="mt-3 d-grid gap-2">
+                            <a asp-controller="Home" asp-action="Details" asp-route-id="@movie.Id" class="btn btn-outline-light">
+                                <i class="fas fa-info-circle me-2"></i>View Details
+                            </a>
+                            <a asp-controller="Screening" asp-action="Index" asp-route-movieId="@movie.Id" class="btn btn-primary">
+                                <i class="fas fa-ticket-alt me-2"></i>Book Tickets
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <div class="card border-0" style="background: rgba(255, 255, 255, 0.02);">
+            <div class="card-body py-5">
+                <i class="fas fa-film fa-5x mb-4" style="color: #e50914; opacity: 0.3;"></i>
+                <h3 class="text-secondary mb-3">No Movies Available</h3>
+                <p class="text-muted">Check back soon for exciting new releases!</p>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #fff;
+    }
+</style>

@@ -1,0 +1,44 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cinema_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: CinemaDb
+      MYSQL_USER: cinema_user
+      MYSQL_PASSWORD: cinema_pass123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ucinema_user", "-pcinema_pass123"]
+      timeout: 20s
+      retries: 10
+      interval: 5s
+      start_period: 40s
+    networks:
+      - cinema_network
+
+  cinematicketsystem:
+    build: .
+    container_name: cinema_app
+    ports:
+      - "8000:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=CinemaDb;Uid=cinema_user;Pwd=cinema_pass123;"
+    networks:
+      - cinema_network
+    restart: on-failure
+
+volumes:
+  mysql_data:
+
+networks:
+  cinema_network:
+    driver: bridge

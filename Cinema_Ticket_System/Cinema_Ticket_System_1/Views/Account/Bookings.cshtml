@@ -1,0 +1,66 @@
+@model IEnumerable<CinemaTicketSystem.Models.Booking>
+
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<div class="container mt-4">
+    <h2>My Bookings</h2>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var booking in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">@booking.Screening?.Movie?.Title</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Cinema:</strong> @booking.Screening?.Cinema?.Name</p>
+                            <p><strong>Screening Time:</strong> @booking.Screening?.ScreeningDateTime.ToString("g")</p>
+                            <p><strong>Booking Date:</strong> @booking.BookingDate.ToString("g")</p>
+
+                            <p><strong>Seats:</strong></p>
+                            <div class="seat-list mb-3">
+                                @foreach (var seat in booking.Seats.OrderBy(s => s.Row).ThenBy(s => s.SeatNumber))
+                                {
+                                    <span class="badge badge-success">Row @seat.Row, Seat @seat.SeatNumber</span>
+                                }
+                            </div>
+
+                            <p><strong>Number of Tickets:</strong> @booking.Seats.Count()</p>
+                            <p><strong class="text-success">Total Price: @booking.TotalPrice.ToString("C")</strong></p>
+                        </div>
+                        <div class="card-footer">
+                            <a asp-controller="Booking" asp-action="Cancel" asp-route-id="@booking.Id" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Cancel Booking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <strong>No bookings yet.</strong>
+            <a asp-controller="Screening" asp-action="Index" class="alert-link">Browse screenings to make a booking</a>.
+        </div>
+    }
+</div>
+
+<style>
+    .seat-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .badge {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+</style>

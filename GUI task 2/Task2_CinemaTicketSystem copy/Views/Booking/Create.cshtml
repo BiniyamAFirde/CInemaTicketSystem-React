@@ -1,0 +1,318 @@
+@model CinemaTicketSystem.ViewModels.BookingViewModel
+
+@{
+    ViewData["Title"] = "Select Seats";
+}
+
+<style>
+    .seat-map-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin: 20px 0;
+        overflow-x: auto; /* This will add a scrollbar if the content overflows */
+    }
+
+    .screen {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: bold;
+        font-size: 18px;
+        color: #666;
+        white-space: nowrap; /* Prevents the screen text from wrapping */
+    }
+
+    .seat-grid {
+        display: inline-block;
+        margin: 0 auto;
+    }
+
+    .seat-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        align-items: center;
+    }
+
+    .row-label {
+        width: 30px;
+        text-align: center;
+        font-weight: bold;
+        color: #666;
+        font-size: 12px;
+    }
+
+    .seat {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0; /* Prevents seats from shrinking */
+    }
+
+    .seat.available {
+        background-color: #28a745;
+        color: white;
+        border-color: #218838;
+    }
+
+    .seat.available:hover {
+        background-color: #20c997;
+        transform: scale(1.1);
+    }
+
+    .seat.booked {
+        background-color: #dc3545;
+        color: white;
+        border-color: #c82333;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .seat.selected {
+        background-color: #007bff;
+        color: white;
+        border-color: #0056b3;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    .seat-legend {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-box {
+        width: 24px;
+        height: 24px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+    }
+
+    .legend-box.available {
+        background-color: #28a745;
+        border-color: #218838;
+    }
+
+    .legend-box.booked {
+        background-color: #dc3545;
+        border-color: #c82333;
+    }
+
+    .legend-box.selected {
+        background-color: #007bff;
+        border-color: #0056b3;
+    }
+
+    .booking-summary {
+        position: sticky;
+        top: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .selected-seats-list {
+        margin: 15px 0;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        min-height: 40px;
+    }
+
+    .total-price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #28a745;
+        margin: 15px 0;
+    }
+
+    .seat-input {
+        display: none;
+    }
+
+    @@media (max-width: 768px) {
+        .seat {
+            width: 28px;
+            height: 28px;
+            font-size: 10px;
+        }
+
+        .seat-row {
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .seat {
+            width: 24px;
+            height: 24px;
+            font-size: 9px;
+        }
+
+        .seat-row {
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">@Model.MovieTitle - Select Your Seats</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p><strong>Cinema:</strong> @Model.CinemaName</p>
+                        <p><strong>Screening:</strong> @Model.ScreeningTime.ToString("dddd, MMMM d, yyyy - h:mm tt")</p>
+                        <p><strong>Price per Seat:</strong> <span class="text-success">@Model.TicketPrice.ToString("C")</span></p>
+                    </div>
+
+                    <div class="seat-legend">
+                        <div class="legend-item">
+                            <div class="legend-box available"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box selected"></div>
+                            <span>Selected</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box booked"></div>
+                            <span>Booked</span>
+                        </div>
+                    </div>
+
+                    <form asp-action="Create" method="post" id="bookingForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <input type="hidden" asp-for="ScreeningId" />
+
+                        <div class="seat-map-container">
+                            <div class="screen">🎬 SCREEN 🎬</div>
+
+                            <div class="text-center">
+                                <div class="seat-grid">
+                                    @{
+                                        var seatsByRow = Model.Seats.GroupBy(s => s.Row).OrderBy(g => g.Key);
+                                    }
+
+                                    @foreach (var row in seatsByRow)
+                                    {
+                                        <div class="seat-row">
+                                            <div class="row-label">Row @row.Key</div>
+                                            @foreach (var seat in row.OrderBy(s => s.SeatNumber))
+                                            {
+                                                var isBooked = seat.Status == "Booked";
+                                                var isAvailable = seat.Status == "Available";
+                                                var seatClass = isBooked ? "booked" : (isAvailable ? "available" : "booked");
+                                                var seatId = $"seat-{seat.Id}";
+
+                                                <label class="seat @seatClass" for="@seatId" title="Row @seat.Row, Seat @seat.SeatNumber" style="cursor: @(isBooked ? "not-allowed" : "pointer");">
+                                                    <input type="checkbox" id="@seatId" name="SelectedSeatIds" value="@seat.Id" class="seat-input" @(isBooked ? "disabled" : "") />
+                                                    @seat.SeatNumber
+                                                </label>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="@Url.Action("Index", "Screening")" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success btn-lg">Confirm Booking</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="booking-summary">
+                <h5>Booking Summary</h5>
+                <hr />
+                <p><strong>Movie:</strong> @Model.MovieTitle</p>
+                <p><strong>Cinema:</strong> @Model.CinemaName</p>
+                <p><strong>Date & Time:</strong> @Model.ScreeningTime.ToString("g")</p>
+                <hr />
+                <p><strong>Selected Seats:</strong></p>
+                <div class="selected-seats-list" id="selectedSeatsList">
+                    <span class="text-muted">Click on seats to select</span>
+                </div>
+                <p><strong>Number of Seats:</strong> <span id="seatCount">0</span></p>
+                <div class="total-price">
+                    Total: <span id="totalPrice">€0.00</span>
+                </div>
+                <p class="text-muted small">Click on green seats to select. Click again to deselect.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // NO EXTERNAL JAVASCRIPT - Using Pure HTML/CSS Form Submission
+        // Seats are selected via checkboxes, which are native HTML form elements
+        // The selected seats are automatically collected by the form's SelectedSeatIds array binding
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const seatCheckboxes = document.querySelectorAll('input[name="SelectedSeatIds"]');
+            const ticketPrice = @Model.TicketPrice;
+
+            function updateSummary() {
+                const selected = Array.from(seatCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => {
+                        const label = cb.parentElement;
+                        return label.textContent.trim();
+                    });
+
+                document.getElementById('seatCount').textContent = selected.length;
+                document.getElementById('totalPrice').textContent = (selected.length * ticketPrice).toFixed(2) + ' €';
+
+                if (selected.length === 0) {
+                    document.getElementById('selectedSeatsList').innerHTML = '<span class="text-muted">Click on seats to select</span>';
+                } else {
+                    document.getElementById('selectedSeatsList').innerHTML = selected.join(', ');
+                }
+
+                // Update visual state
+                seatCheckboxes.forEach(cb => {
+                    const label = cb.parentElement;
+                    if (cb.checked && !cb.disabled) {
+                        label.classList.add('selected');
+                    } else if (!cb.disabled) {
+                        label.classList.remove('selected');
+                    }
+                });
+            }
+
+            seatCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSummary);
+            });
+
+            updateSummary();
+        });
+    </script>
+}

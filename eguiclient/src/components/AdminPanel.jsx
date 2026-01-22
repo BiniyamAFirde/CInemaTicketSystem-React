@@ -139,7 +139,7 @@ function AdminPanel({ currentUser, onLogout }) {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      rowVersion: user.rowVersion 
+      rowVersion: user.rowVersion  // store current rowVersion
     });
     setShowEditUserModal(true);
   };
@@ -150,12 +150,12 @@ function AdminPanel({ currentUser, onLogout }) {
     setError('');
     setSuccess('');
 
-    try {
+    try { // send update request with rowVersion
       await apiService.updateUser(editingUser.id, {
         firstName: editUserForm.firstName,
         lastName: editUserForm.lastName,
         phoneNumber: editUserForm.phoneNumber,
-        rowVersion: editUserForm.rowVersion 
+        rowVersion: editUserForm.rowVersion // send current rowVersion
       });
       
       setSuccess('✅ User updated successfully!');
@@ -164,13 +164,13 @@ function AdminPanel({ currentUser, onLogout }) {
       await loadData();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      
+      // back
       if (err.conflict) {
         setError('⚠️ CONFLICT: This user was modified by another admin. Refreshing with latest data...');
         setTimeout(async () => {
           setShowEditUserModal(false);
           setEditingUser(null);
-          await loadData();
+          await loadData(); //refresh
           setError('');
         }, 3000);
       } else {

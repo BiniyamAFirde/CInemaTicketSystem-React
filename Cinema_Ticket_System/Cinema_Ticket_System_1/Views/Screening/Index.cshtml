@@ -1,0 +1,51 @@
+@using CinemaTicketSystem.Models
+@model IEnumerable<Screening>
+
+@{
+    ViewData["Title"] = "Screenings";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Screenings</h2>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-success">+ Add Screening</a>
+    }
+</div>
+
+@if (Model.Any())
+{
+    <div class="row g-4">
+        @foreach (var screening in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@screening.Movie?.Title</h5>
+                        <p class="card-text">
+                            <strong>Cinema:</strong> @screening.Cinema?.Name<br />
+                            <strong>Layout:</strong> @screening.Cinema?.Rows rows x @screening.Cinema?.SeatsPerRow seats<br />
+                            <strong>Date & Time:</strong> @screening.ScreeningDateTime.ToString("g")<br />
+                            <strong>Seats Available:</strong> @screening.Seats.Count(s => s.Status == SeatStatus.Available) / @screening.Seats.Count<br />
+                            <strong>Price:</strong> €@screening.TicketPrice.ToString("F2")
+                        </p>
+                    </div>
+                    <div class="card-footer bg-light">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@screening.Id" class="btn btn-sm btn-danger">Delete</a>
+                        }
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a asp-controller="Booking" asp-action="Create" asp-route-screeningId="@screening.Id" class="btn btn-sm btn-primary">Book Now</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">No screenings available at the moment.</div>
+}

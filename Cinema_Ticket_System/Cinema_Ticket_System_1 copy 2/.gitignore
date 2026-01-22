@@ -1,0 +1,23 @@
+# Check if exists
+cat .gitignore
+
+# If not, create it:
+cat > .gitignore << 'EOF'
+# Build
+bin/
+obj/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# OS
+.DS_Store
+
+# Sensitive
+appsettings.json
+appsettings.Development.json
+
+EOF

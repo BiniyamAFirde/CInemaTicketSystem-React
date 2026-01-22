@@ -1,0 +1,35 @@
+@using CinemaTicketSystem.ViewModels
+@model Screening
+
+@{
+    ViewData["Title"] = "Delete Screening";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Delete Screening</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-warning">
+                    <strong>Are you sure?</strong> This action cannot be undone.
+                </div>
+
+                <p>
+                    <strong>Movie:</strong> @Model.Movie?.Title<br />
+                    <strong>Cinema:</strong> @Model.Cinema?.Name<br />
+                    <strong>Layout:</strong> @Model.Cinema?.Rows rows x @Model.Cinema?.SeatsPerRow seats<br />
+                    <strong>Date & Time:</strong> @Model.ScreeningDateTime.ToString("g")<br />
+                    <strong>Total Seats:</strong> @Model.Cinema?.TotalSeats
+                </p>
+
+                <form method="post" asp-action="Delete" novalidate style="display:inline;">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

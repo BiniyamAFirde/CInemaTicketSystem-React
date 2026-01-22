@@ -1,0 +1,98 @@
+To get the Cinema Ticket System application running, you now have two primary options: local execution (using `dotnet run`) or Docker Compose execution.
+
+***
+
+### Option 1: Local Execution (`dotnet run`) - Troubleshooting "Access Denied"
+
+It seems you are still encountering an "Access denied" error when running `dotnet run` or `dotnet ef database update`, even with the `cinema_mysql` container showing as `healthy`. This indicates that the `cinema_user` does not have proper access to the `CinemaDb` database *inside your running Dockerized MySQL container*.
+
+A "healthy" status for the container means the MySQL server process is running, but it doesn't guarantee that the specific user and database for your application are configured within it. You need to explicitly set these up.
+
+Please follow these steps *exactly* to configure the user and database inside your running Dockerized MySQL container:
+
+**Step 1: Ensure your `cinema_mysql` Docker container is running.**
+
+*   Open a terminal in your project's root directory.
+*   Verify its status:
+    ```bash
+    docker-compose ps
+    ```
+    Ensure that `cinema_mysql` is listed and its status is `Up (healthy)`. If it's not running, start it with: `docker-compose up -d mysql`.
+
+**Step 2: Connect to your running Dockerized MySQL container.**
+
+*   From the same terminal, execute this command to connect to the MySQL server *inside* the `cinema_mysql` container:
+    ```bash
+    docker exec -it cinema_mysql mysql -u root -p
+    ```
+*   When prompted for a password, enter `root123`. This is the `MYSQL_ROOT_PASSWORD` defined in your `docker-compose.yml` for the MySQL container. You should now see the `mysql>` prompt.
+
+**Step 3: Execute the necessary SQL commands at the MySQL prompt.**
+
+*   Once you are successfully connected to the MySQL prompt (you should see `mysql>`), carefully copy and paste the following SQL commands and execute them one by one. Press Enter after each semicolon `;`.
+
+    ```sql
+    -- Create the database if it doesn't exist. This is the database your application will use.
+    CREATE DATABASE IF NOT EXISTS CinemaDb;
+
+    -- Drop the user if it already exists. This ensures a clean setup for 'cinema_user'.
+    DROP USER IF EXISTS 'cinema_user'@'%';
+
+    -- Create the 'cinema_user' with the specified password.
+    -- The '%' means this user can connect from any host, including 'localhost' from your host machine (which your .NET app will use).
+    CREATE USER 'cinema_user'@'%' IDENTIFIED BY 'cinema_pass123';
+
+    -- Grant all privileges on the 'CinemaDb' database to 'cinema_user'.
+    GRANT ALL PRIVILEGES ON CinemaDb.* TO 'cinema_user'@'%';
+
+    -- Apply changes to the user privilege tables. This is crucial for the changes to take effect.
+    FLUSH PRIVILEGES;
+
+    -- Exit the MySQL prompt.
+    EXIT;
+    ```
+
+**Step 4: Apply Database Migrations.**
+
+*   After successfully executing all SQL commands in Step 3 and exiting the MySQL prompt, return to your project's root directory terminal.
+*   Run the following command to apply your Entity Framework Core migrations, which will create the necessary tables (like `Movies`) in your `CinemaDb` database:
+    ```bash
+    dotnet ef database update
+    ```
+    This command should now succeed, as the `cinema_user` will have the correct permissions.
+
+**Step 5: Rerun the application.**
+
+*   After successfully completing all previous steps, try running your application again:
+    ```bash
+    dotnet run
+    ```
+*   Then, access `http://localhost:5087/` in your web browser.
+
+Please provide the exact output of each command you execute (especially `docker exec`, the SQL commands, and `dotnet ef database update`). This will help immensely in confirming the setup.
+
+***
+
+### Option 2: Docker Compose Execution (Recommended for Integrated Setup)
+
+This option runs both your MySQL database and the .NET application within Docker containers, managing them as a single multi-container application.
+
+1.  **Ensure Docker is running:** Make sure Docker Desktop or your Docker daemon is running on your system.
+
+2.  **Open a terminal** in the root directory of the `Cinema_Ticket_System` project (where `docker-compose.yml` and `Dockerfile` are located).
+
+3.  **Build and run the services:** Execute the following command:
+    ```bash
+    docker-compose up --build
+    ```
+    This command will:
+    *   Build the `cinematicketsystem` Docker image based on the `Dockerfile`.
+    *   Create and start both the `mysql` database container and the `cinematicketsystem` application container.
+    *   It will wait for the MySQL database to be healthy before starting the .NET application.
+    *   The `docker-compose.yml` file explicitly sets the `ConnectionStrings__DefaultConnection` environment variable for the `cinematicketsystem` service. This will override any connection string defined in `appsettings.Development.json` for the Dockerized application, ensuring it connects to the `mysql` service within the Docker network:
+        ```
+        ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=CinemaDb;Uid=cinema_user;Pwd=cinema_pass123;"
+        ```
+    *   It maps the container ports (8080/8081 for the app, 3306 for MySQL) to your host machine's ports (80/443 for the app, 3306 for MySQL).
+
+4.  **Access the application:** Once both services are up and running, you should be able to access the application by navigating to `http://localhost/` or `https://localhost/` in your web browser.

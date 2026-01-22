@@ -1,0 +1,426 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Cinema Ticket System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #e50914;
+            --primary-hover: #b20710;
+            --secondary-color: #831010;
+            --dark-bg: #141414;
+            --darker-bg: #0a0a0a;
+            --card-bg: #1f1f1f;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --border-color: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(to bottom, var(--darker-bg) 0%, var(--dark-bg) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.75rem;
+            color: var(--primary-color) !important;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+        }
+
+        .navbar-brand i {
+            margin-right: 8px;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-primary) !important;
+            margin: 0 8px;
+            padding: 8px 16px !important;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+            background: rgba(229, 9, 20, 0.1);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        .navbar-text {
+            color: var(--text-primary) !important;
+            font-weight: 600;
+        }
+
+        .dropdown-menu {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(229, 9, 20, 0.2);
+            color: var(--primary-color);
+        }
+
+        .dropdown-divider {
+            border-color: var(--border-color);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(229, 9, 20, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 1.25rem;
+        }
+
+        .btn-primary, .btn-success, .btn-info {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover, .btn-success:hover, .btn-info:hover {
+            background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(229, 9, 20, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(220, 53, 69, 0.4);
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: 1px solid;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .alert-info {
+            background: rgba(13, 110, 253, 0.1);
+            border-color: rgba(13, 110, 253, 0.3);
+            color: #66b3ff;
+        }
+
+        .table {
+            color: var(--text-primary);
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background: rgba(229, 9, 20, 0.2);
+        }
+
+        .table th {
+            border-color: var(--border-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            border-color: var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        footer {
+            background: var(--darker-bg);
+            color: var(--text-secondary);
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        footer h6 {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        footer hr {
+            border-color: var(--border-color);
+            margin: 2rem 0 1.5rem;
+        }
+
+        footer .text-center p {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--primary-hover);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-hover);
+        }
+
+        @@media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+
+            .card:hover {
+                transform: translateY(-4px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-film"></i> Cinema Ticket System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Screening" asp-action="Index">
+                            <i class="fas fa-ticket-alt"></i> Screenings
+                        </a>
+                    </li>
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Screening" asp-action="Create">
+                                    <i class="fas fa-plus-circle"></i> Add Screening
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="UserManagement" asp-action="Index">
+                                    <i class="fas fa-users-cog"></i> Manage Users
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> <span class="navbar-text">@User.Identity?.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Bookings"><i class="fas fa-ticket-alt"></i> My Bookings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" asp-controller="Account" asp-action="Logout" style="display:inline;">
+                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main role="main">
+        <div class="container my-4">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-film"></i> About Cinema Ticket System</h6>
+                    <p>Your premier destination for booking cinema tickets online. Experience the magic of movies with seamless booking and premium service.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6><i class="fas fa-info-circle"></i> Quick Links</h6>
+                    <p>
+                        <a href="#" class="text-decoration-none me-3">Privacy Policy</a>
+                        <a href="#" class="text-decoration-none me-3">Terms of Service</a>
+                        <a href="#" class="text-decoration-none">Contact Us</a>
+                    </p>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <p>&copy; 2025 Cinema Ticket System. All rights reserved. | Developed by Biniyam Awalachew Firde</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('form[novalidate]');
+                Array.prototype.slice.call(forms).forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
